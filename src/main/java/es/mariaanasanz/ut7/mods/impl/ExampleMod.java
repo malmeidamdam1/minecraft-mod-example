@@ -2,8 +2,12 @@ package es.mariaanasanz.ut7.mods.impl;
 
 import es.mariaanasanz.ut7.mods.base.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -11,6 +15,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.ItemFishedEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -22,20 +27,20 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
         IItemPickupEvent, ILivingDamageEvent, IUseItemEvent, IFishedEvent,
         IInteractEvent, IMovementEvent {
 
-    public ExampleMod(){
+    public ExampleMod() {
         super();
     }
 
     @Override
     public String autor() {
-        return "Midgard Almeida Minda ";
+        return "Midgard Almeida Minda";
     }
 
     @Override
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event) {
         BlockPos pos = event.getPos();
-        System.out.println("Bloque destruido en la posicion "+pos);
+        System.out.println("Bloque destruido en la posicion " + pos);
     }
 
     @Override
@@ -54,20 +59,20 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
     @Override
     @SubscribeEvent
     public void onLivingDamage(LivingDamageEvent event) {
-        System.out.println("evento LivingDamageEvent invocado "+event.getEntity().getClass()+" provocado por "+event.getSource().getEntity());
+        System.out.println("evento LivingDamageEvent invocado " + event.getEntity().getClass() + " provocado por " + event.getSource().getEntity());
     }
 
     @Override
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
-        System.out.println("evento LivingDeathEvent invocado "+event.getEntity().getClass()+" provocado por "+event.getSource().getEntity());
+        System.out.println("evento LivingDeathEvent invocado " + event.getEntity().getClass() + " provocado por " + event.getSource().getEntity());
 
     }
 
     @Override
     @SubscribeEvent
     public void onUseItem(LivingEntityUseItemEvent event) {
-        LOGGER.info("evento LivingEntityUseItemEvent invocado "+event.getEntity().getClass());
+        LOGGER.info("evento LivingEntityUseItemEvent invocado " + event.getEntity().getClass());
     }
 
 
@@ -97,19 +102,90 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
     @SubscribeEvent
 //TODO El evento con el que voy a trabajar
     public void onPlayerWalk(MovementInputUpdateEvent event) {
-        if(event.getEntity() instanceof Player){
-            if(event.getInput().down){
-                System.out.println("down"+event.getInput().down);
+        if (event.getEntity() instanceof Player) {
+
+        ItemStack boots = event.getEntity().getInventory().getArmor(0); //Guardo valor botas
+
+            if (event.getInput().down) {
+                System.out.println("down" + event.getInput().down);
+                System.out.println("Tienes " + boots);
             }
-            if(event.getInput().up){
-                System.out.println("up"+event.getInput().up);
+            if (event.getInput().up) {
+                System.out.println("up" + event.getInput().up);
+                System.out.println("Tienes " + boots);
             }
-            if(event.getInput().right){
-                System.out.println("right"+event.getInput().right);
+            if (event.getInput().right) {
+                System.out.println("right" + event.getInput().right);
+                System.out.println("Tienes " + boots);
             }
-            if(event.getInput().left){
-                System.out.println("left"+event.getInput().left);
+            if (event.getInput().left) {
+                System.out.println("left" + event.getInput().left);
+                System.out.println("Tienes " + boots);
             }
+
         }
     }
+
+
+
+    @SubscribeEvent
+    public void compruebaBotas(PlayerEvent event) {
+
+//            Items.LEATHER_BOOTS;
+//        Items.IRON_BOOTS;
+//        Items.GOLDEN_BOOTS;
+//        Items.DIAMOND_BOOTS;
+//
+
+
+//        if(player instanceof  Player) {
+//            ItemStack boots = player.getInventory().getArmor(0);
+//            if (boots != null) {
+//                System.out.println("Tienes " + boots);
+//            }else{
+//                System.out.println("No llevas");
+//            }
+//        }
+
+        if(event.getEntity() instanceof Player){
+            ItemStack boots = event.getEntity().getInventory().getArmor(0);
+
+            if(boots.is(Items.GOLDEN_BOOTS)){
+                System.out.println("Llevas botas de oro");
+            }
+            if(boots.is(Items.DIAMOND_BOOTS)){
+                System.out.println("Llevas botas de diamanete");
+            }
+            if(boots.is(Items.LEATHER_BOOTS)){
+                System.out.println("Llevas botas de cuero");
+            }
+            if(boots.is(Items.IRON_BOOTS)){
+                System.out.println("Llevas botas de hierro");
+            }
+//            else{
+//                System.out.println("Llevas aire");
+//            }
+
+        }
+
+
+
+//        ItemStack boots = player.getInventory().getArmorContents()[0];
+//        if (boots != null) {
+//            Class<? extends Item> itemType = boots.getItemType();
+//            if (ItemStack.class.isAssignableFrom(itemType)) {
+//                if (itemType.isAssignableFrom(Items.LEATHER_BOOTS.getClass())) {
+//                    // El jugador está usando botas de cuero.
+//                } else if (itemType.isAssignableFrom(Items.IRON_BOOTS.getClass())) {
+//                    // El jugador está usando botas de hierro.
+//                } else if (itemType.isAssignableFrom(Items.GOLDEN_BOOTS.getClass())) {
+//                    // El jugador está usando botas de oro.
+//                } else if (itemType.isAssignableFrom(Items.DIAMOND_BOOTS.getClass())) {
+//                    // El jugador está usando botas de diamante.
+//                }
+//            }
+//        }
+
+    }
+
 }
