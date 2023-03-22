@@ -28,7 +28,7 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
 
     @Override
     public String autor() {
-        return "Javier Jorge Soteras";
+        return "Midgard Almeida Minda ";
     }
 
     @Override
@@ -95,6 +95,7 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
 
     @Override
     @SubscribeEvent
+//TODO El evento con el que voy a trabajar
     public void onPlayerWalk(MovementInputUpdateEvent event) {
         if(event.getEntity() instanceof Player){
             if(event.getInput().down){
