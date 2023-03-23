@@ -1,14 +1,22 @@
 package es.mariaanasanz.ut7.mods.impl;
 
 import es.mariaanasanz.ut7.mods.base.*;
+import jdk.javadoc.doclet.Taglet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.commands.SetBlockCommand;
+import net.minecraft.server.commands.WorldBorderCommand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.PlayerHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -21,6 +29,8 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import javax.xml.stream.Location;
 
 @Mod(DamMod.MOD_ID)
 public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStartEvent,
@@ -103,16 +113,37 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
 //TODO El evento con el que voy a trabajar
     public void onPlayerWalk(MovementInputUpdateEvent event) {
         if (event.getEntity() instanceof Player) {
+            Player jugador = event.getEntity();
 
-        ItemStack boots = event.getEntity().getInventory().getArmor(0); //Guardo valor botas
+            ItemStack boots = event.getEntity().getInventory().getArmor(0); //Guardo valor botas
+
+            Level mundo = jugador.getCommandSenderWorld();
+
+            Block bloqueOro = Blocks.GOLD_BLOCK;
+
+
+            Vec3 position = jugador.position()  ;
+            BlockPos posActual = new BlockPos(position);
+
+
+        // mundo.setBlock(bloquepos, bloqueOro.defaultBlockState(),2); //Saca uno atras
+
 
             if (event.getInput().down) {
                 System.out.println("down" + event.getInput().down);
                 System.out.println("Tienes " + boots);
+
             }
             if (event.getInput().up) {
                 System.out.println("up" + event.getInput().up);
                 System.out.println("Tienes " + boots);
+
+                mundo.setBlock(posActual.south(), bloqueOro.defaultBlockState(),1);
+
+
+
+
+
             }
             if (event.getInput().right) {
                 System.out.println("right" + event.getInput().right);
@@ -127,6 +158,22 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
     }
 
 
+
+
+
+//    @SubscribeEvent
+//    public void onPlayerMove(PlayerEvent event) {
+////        Player player = event.getEntity();
+////        Location location = player.getLocation();
+////        Block block = location();
+//
+//        int x = player.getBlockX();
+//        int y = player.getBlockY();
+//        int z = player.getBlockY();
+//
+//
+//        System.out.println("El jugador está en el bloque " + block.getType() + " en la ubicación " + block.getLocation());
+//    }
 
     @SubscribeEvent
     public void compruebaBotas(PlayerEvent event) {
@@ -147,26 +194,26 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
 //            }
 //        }
 
-        if(event.getEntity() instanceof Player){
-            ItemStack boots = event.getEntity().getInventory().getArmor(0);
-
-            if(boots.is(Items.GOLDEN_BOOTS)){
-                System.out.println("Llevas botas de oro");
-            }
-            if(boots.is(Items.DIAMOND_BOOTS)){
-                System.out.println("Llevas botas de diamanete");
-            }
-            if(boots.is(Items.LEATHER_BOOTS)){
-                System.out.println("Llevas botas de cuero");
-            }
-            if(boots.is(Items.IRON_BOOTS)){
-                System.out.println("Llevas botas de hierro");
-            }
-//            else{
-//                System.out.println("Llevas aire");
+//        if(event.getEntity() instanceof Player){
+//            ItemStack boots = event.getEntity().getInventory().getArmor(0);
+//
+//            if(boots.is(Items.GOLDEN_BOOTS)){
+//                System.out.println("Llevas botas de oro");
 //            }
-
-        }
+//            if(boots.is(Items.DIAMOND_BOOTS)){
+//                System.out.println("Llevas botas de diamanete");
+//            }
+//            if(boots.is(Items.LEATHER_BOOTS)){
+//                System.out.println("Llevas botas de cuero");
+//            }
+//            if(boots.is(Items.IRON_BOOTS)){
+//                System.out.println("Llevas botas de hierro");
+//            }
+////            else{
+////                System.out.println("Llevas aire");
+////            }
+//
+//        }
 
 
 
