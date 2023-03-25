@@ -132,36 +132,41 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
 
             Block bloqueOro = Blocks.GOLD_BLOCK;
 
+            Block macetas = Blocks.FLOWER_POT;
+
+            Block flores = Blocks.FLOWERING_AZALEA;
+
             BlockState estado = jugador.getBlockStateOn(); //EstadoBloqueDebajo
 
             BlockPos posActual = jugador.getOnPos();   //Bloque debajo (pisando ahora)
+
+
+
 //            estado.addRunningEffects()
 
-            //Ejecutamos si el jugador ha pisado ya el bloque Y no es sobre el que esta
-                 if(bloquesPisados.contains(posAnterior) && !posActual.equals(posAnterior)) {
-                     if (!estado.isAir()) { //Poner si queremos NO aplique en el aire
+            //Ejecutamos si el jugador ha pisado ya el bloque Y NO ES sobre el que esta ahora
+             if(bloquesPisados.contains(posAnterior) && !posActual.equals(posAnterior)) {
+                 if (mundo.getBlockState(posAnterior).getMaterial().isSolid()) { //No transformamos "bloques" de aire
 
-                         if (boots.getItem().equals(Items.GOLDEN_BOOTS)) {
-                             mundo.setBlockAndUpdate(posAnterior, bloqueOro.defaultBlockState());
-                         }
+                     if (boots.getItem().equals(Items.GOLDEN_BOOTS)){
+                         mundo.setBlockAndUpdate(posAnterior, bloqueOro.defaultBlockState());
+                     }
 
-                         if (boots.getItem().equals(Items.LEATHER_BOOTS)) {
-                         }
+                     if (boots.getItem().equals(Items.LEATHER_BOOTS)) {
+                     }
 
-                         if (boots.getItem().equals(Items.IRON_BOOTS)) {
-                         }
+                     if (boots.getItem().equals(Items.IRON_BOOTS)) {
+                     }
 
-                         if (boots.getItem().equals(Items.DIAMOND_BOOTS)) {
-                         }
+                     if (boots.getItem().equals(Items.DIAMOND_BOOTS)) {
+                         mundo.setBlockAndUpdate(posAnterior,flores.defaultBlockState());
                      }
                  }
-                 else{//No cambiamos el suelo pero añadimos la posicion
-                     bloquesPisados.add(posActual);
-                 }//PosAnterior se actualiza constantemente
-                posAnterior = posActual;
-
-
-
+             }
+             else{//No cambiamos el suelo pero añadimos la posicion
+                 bloquesPisados.add(posActual);
+             }//PosAnterior se actualiza constantemente
+            posAnterior = posActual;
             }
         }
 
