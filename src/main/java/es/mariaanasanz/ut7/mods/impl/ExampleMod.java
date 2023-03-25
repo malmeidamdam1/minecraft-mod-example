@@ -37,6 +37,7 @@ import net.minecraftforge.fml.common.Mod;
 import javax.xml.stream.Location;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 @Mod(DamMod.MOD_ID)
@@ -118,7 +119,10 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
 
 //---------------------------------------------------------Desde aqui mi mod------------------------------------------//
     private Set<BlockPos> bloquesPisados = new HashSet<>();
+
+    private ArrayList<Block> floresVarias = new ArrayList<>();
     private BlockPos posAnterior;
+
     //Creo como atributo fuera para que no se reinicie llamar metodo
     @Override
     @SubscribeEvent
@@ -132,19 +136,26 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
 
             Block bloqueOro = Blocks.GOLD_BLOCK;
 
-            Block macetas = Blocks.FLOWER_POT;
+            floresVarias.add(Blocks.POPPY);
+            floresVarias.add(Blocks.ORANGE_TULIP);
+            floresVarias.add(Blocks.CORNFLOWER);
+            floresVarias.add(Blocks.BLUE_ORCHID);
+            floresVarias.add(Blocks.WHITE_TULIP);
+            floresVarias.add(Blocks.PINK_TULIP);
+            floresVarias.add(Blocks.OXEYE_DAISY);
 
-            Block flores = Blocks.FLOWERING_AZALEA;
+
 
             BlockState estado = jugador.getBlockStateOn(); //EstadoBloqueDebajo
-
             BlockPos posActual = jugador.getOnPos();   //Bloque debajo (pisando ahora)
+
 
 
 
 //            estado.addRunningEffects()
 
             //Ejecutamos si el jugador ha pisado ya el bloque Y NO ES sobre el que esta ahora
+
              if(bloquesPisados.contains(posAnterior) && !posActual.equals(posAnterior)) {
                  if (mundo.getBlockState(posAnterior).getMaterial().isSolid()) { //No transformamos "bloques" de aire
 
@@ -159,7 +170,10 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
                      }
 
                      if (boots.getItem().equals(Items.DIAMOND_BOOTS)) {
-                         mundo.setBlockAndUpdate(posAnterior,flores.defaultBlockState());
+                         int aleatorio = (int) (Math.random()*50);
+                         mundo.setBlockAndUpdate(posAnterior.above(),floresVarias.get(aleatorio).defaultBlockState());
+
+
                      }
                  }
              }
