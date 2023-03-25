@@ -2,6 +2,7 @@ package es.mariaanasanz.ut7.mods.impl;
 
 import es.mariaanasanz.ut7.mods.base.*;
 import jdk.javadoc.doclet.Taglet;
+import net.minecraft.client.player.Input;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.commands.SetBlockCommand;
 import net.minecraft.server.commands.WorldBorderCommand;
@@ -11,11 +12,14 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.PlayerHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
@@ -31,6 +35,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import javax.xml.stream.Location;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Mod(DamMod.MOD_ID)
 public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStartEvent,
@@ -108,131 +115,75 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
         }
     }
 
+
+//---------------------------------------------------------Desde aqui mi mod------------------------------------------//
+    private Set<BlockPos> bloquesPisados = new HashSet<>();
+    private BlockPos posAnterior;
+    //Creo como atributo fuera para que no se reinicie llamar metodo
     @Override
     @SubscribeEvent
 //TODO El evento con el que voy a trabajar
-    public void onPlayerWalk(MovementInputUpdateEvent event) {
+        public void onPlayerWalk(MovementInputUpdateEvent event) {
         if (event.getEntity() instanceof Player) {
             Player jugador = event.getEntity();
-
-            ItemStack boots = event.getEntity().getInventory().getArmor(0); //Guardo valor botas
-
             Level mundo = jugador.getCommandSenderWorld();
+
+            ItemStack boots = jugador.getInventory().getArmor(0); //Guardo cualquier valor que tengan Botas
 
             Block bloqueOro = Blocks.GOLD_BLOCK;
 
+            BlockState estado = jugador.getBlockStateOn(); //EstadoBloqueDebajo
 
-            Vec3 position = jugador.position()  ;
-            BlockPos posActual = new BlockPos(position);
+            BlockPos posActual = jugador.getOnPos();   //Bloque debajo (pisando ahora)
+//            estado.addRunningEffects()
+
+            //Ejecutamos si el jugador ha pisado ya el bloque Y no es sobre el que esta
+                 if(bloquesPisados.contains(posAnterior) && !posActual.equals(posAnterior)) {
+                     if (!estado.isAir()) { //Poner si queremos NO aplique en el aire
+
+                         if (boots.getItem().equals(Items.GOLDEN_BOOTS)) {
+                             mundo.setBlockAndUpdate(posAnterior, bloqueOro.defaultBlockState());
+                         }
+
+                         if (boots.getItem().equals(Items.LEATHER_BOOTS)) {
+                         }
+
+                         if (boots.getItem().equals(Items.IRON_BOOTS)) {
+                         }
+
+                         if (boots.getItem().equals(Items.DIAMOND_BOOTS)) {
+                         }
+                     }
+                 }
+                 else{//No cambiamos el suelo pero añadimos la posicion
+                     bloquesPisados.add(posActual);
+                 }//PosAnterior se actualiza constantemente
+                posAnterior = posActual;
 
 
-        // mundo.setBlock(bloquepos, bloqueOro.defaultBlockState(),2); //Saca uno atras
-
-
-            if (event.getInput().down) {
-                System.out.println("down" + event.getInput().down);
-                System.out.println("Tienes " + boots);
 
             }
-            if (event.getInput().up) {
-                System.out.println("up" + event.getInput().up);
-                System.out.println("Tienes " + boots);
-
-                mundo.setBlock(posActual.south(), bloqueOro.defaultBlockState(),1);
-
-
-
-
-
-            }
-            if (event.getInput().right) {
-                System.out.println("right" + event.getInput().right);
-                System.out.println("Tienes " + boots);
-            }
-            if (event.getInput().left) {
-                System.out.println("left" + event.getInput().left);
-                System.out.println("Tienes " + boots);
-            }
-
         }
-    }
-
-
-
-
-
-//    @SubscribeEvent
-//    public void onPlayerMove(PlayerEvent event) {
-////        Player player = event.getEntity();
-////        Location location = player.getLocation();
-////        Block block = location();
-//
-//        int x = player.getBlockX();
-//        int y = player.getBlockY();
-//        int z = player.getBlockY();
-//
-//
-//        System.out.println("El jugador está en el bloque " + block.getType() + " en la ubicación " + block.getLocation());
-//    }
-
-    @SubscribeEvent
-    public void compruebaBotas(PlayerEvent event) {
-
-//            Items.LEATHER_BOOTS;
-//        Items.IRON_BOOTS;
-//        Items.GOLDEN_BOOTS;
-//        Items.DIAMOND_BOOTS;
-//
-
-
-//        if(player instanceof  Player) {
-//            ItemStack boots = player.getInventory().getArmor(0);
-//            if (boots != null) {
-//                System.out.println("Tienes " + boots);
-//            }else{
-//                System.out.println("No llevas");
-//            }
-//        }
-
-//        if(event.getEntity() instanceof Player){
-//            ItemStack boots = event.getEntity().getInventory().getArmor(0);
-//
-//            if(boots.is(Items.GOLDEN_BOOTS)){
-//                System.out.println("Llevas botas de oro");
-//            }
-//            if(boots.is(Items.DIAMOND_BOOTS)){
-//                System.out.println("Llevas botas de diamanete");
-//            }
-//            if(boots.is(Items.LEATHER_BOOTS)){
-//                System.out.println("Llevas botas de cuero");
-//            }
-//            if(boots.is(Items.IRON_BOOTS)){
-//                System.out.println("Llevas botas de hierro");
-//            }
-////            else{
-////                System.out.println("Llevas aire");
-////            }
-//
-//        }
-
-
-
-//        ItemStack boots = player.getInventory().getArmorContents()[0];
-//        if (boots != null) {
-//            Class<? extends Item> itemType = boots.getItemType();
-//            if (ItemStack.class.isAssignableFrom(itemType)) {
-//                if (itemType.isAssignableFrom(Items.LEATHER_BOOTS.getClass())) {
-//                    // El jugador está usando botas de cuero.
-//                } else if (itemType.isAssignableFrom(Items.IRON_BOOTS.getClass())) {
-//                    // El jugador está usando botas de hierro.
-//                } else if (itemType.isAssignableFrom(Items.GOLDEN_BOOTS.getClass())) {
-//                    // El jugador está usando botas de oro.
-//                } else if (itemType.isAssignableFrom(Items.DIAMOND_BOOTS.getClass())) {
-//                    // El jugador está usando botas de diamante.
-//                }
-//            }
-//        }
-
-    }
 
 }
+
+//            if (event.getInput().down) {
+//                System.out.println("down" + event.getInput().down);
+//
+//            }
+//            if (event.getInput().up) {
+//                System.out.println("up" + event.getInput().up);
+//
+//            }
+//            if (event.getInput().right) {
+//                System.out.println("right" + event.getInput().right);
+////                mundo.setBlockAndUpdate(posAnterior,bloqueOro.defaultBlockState());
+//
+//            }
+//            if (event.getInput().left) {
+//                System.out.println("left" + event.getInput().left);
+////                mundo.setBlockAndUpdate(posAnterior,bloqueOro.defaultBlockState());
+
+
+
+
