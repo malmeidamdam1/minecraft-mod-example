@@ -2,10 +2,18 @@ package es.mariaanasanz.ut7.mods.impl;
 
 import es.mariaanasanz.ut7.mods.base.*;
 import jdk.javadoc.doclet.Taglet;
+import net.minecraft.client.particle.FireworkParticles;
+import net.minecraft.client.particle.FlameParticle;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.player.Input;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.server.commands.SetBlockCommand;
 import net.minecraft.server.commands.WorldBorderCommand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
@@ -136,6 +144,10 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
 
             Block bloqueOro = Blocks.GOLD_BLOCK;
 
+            Block fuego = Blocks.FIRE;
+            Block noFuego = Blocks.RED_CANDLE; //Alternativo
+
+
             floresVarias.add(Blocks.POPPY);
             floresVarias.add(Blocks.ORANGE_TULIP);
             floresVarias.add(Blocks.CORNFLOWER);
@@ -144,36 +156,44 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
             floresVarias.add(Blocks.PINK_TULIP);
             floresVarias.add(Blocks.OXEYE_DAISY);
 
-
-
             BlockState estado = jugador.getBlockStateOn(); //EstadoBloqueDebajo
             BlockPos posActual = jugador.getOnPos();   //Bloque debajo (pisando ahora)
-
-
-
 
 //            estado.addRunningEffects()
 
             //Ejecutamos si el jugador ha pisado ya el bloque Y NO ES sobre el que esta ahora
-
              if(bloquesPisados.contains(posAnterior) && !posActual.equals(posAnterior)) {
                  if (mundo.getBlockState(posAnterior).getMaterial().isSolid()) { //No transformamos "bloques" de aire
 
                      if (boots.getItem().equals(Items.GOLDEN_BOOTS)){
-                         mundo.setBlockAndUpdate(posAnterior, bloqueOro.defaultBlockState());
+                         mundo.setBlockAndUpdate(posAnterior.above(), bloqueOro.defaultBlockState());
                      }
 
                      if (boots.getItem().equals(Items.LEATHER_BOOTS)) {
+                         //Aleatorio de [1,2]
+                         int aleatorio = (int) (Math.random()*2)+1;
+                         if(aleatorio==1) {
+                             mundo.setBlockAndUpdate(posAnterior.above(), fuego.defaultBlockState());
+                         }
+//                         else { //Alternativo
+//                             mundo.setBlockAndUpdate(posAnterior.above(), noFuego.defaultBlockState());
+//                         }
+//                        SimpleParticleType fuego2 = ParticleTypes.FLAME;
+//                        mundo.addAlwaysVisibleParticle(fuego2, posAnterior.getX(), posAnterior.getY(), posAnterior.getZ(), 0, 0, 0);
                      }
 
                      if (boots.getItem().equals(Items.IRON_BOOTS)) {
+                         int aleatorio = (int) (Math.random()*10)+1;
+                         if(aleatorio == 10) {
+                             System.out.println("Esto se imprime el 10% de las veces");
+                         }
+
+
                      }
 
                      if (boots.getItem().equals(Items.DIAMOND_BOOTS)) {
                          int aleatorio = (int) (Math.random()*50);
                          mundo.setBlockAndUpdate(posAnterior.above(),floresVarias.get(aleatorio).defaultBlockState());
-
-
                      }
                  }
              }
