@@ -21,6 +21,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Explosion.BlockInteraction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -127,7 +129,6 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
 
 //---------------------------------------------------------Desde aqui mi mod------------------------------------------//
     private Set<BlockPos> bloquesPisados = new HashSet<>();
-
     private ArrayList<Block> floresVarias = new ArrayList<>();
     private BlockPos posAnterior;
 
@@ -140,13 +141,9 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
             Player jugador = event.getEntity();
             Level mundo = jugador.getCommandSenderWorld();
 
-            ItemStack boots = jugador.getInventory().getArmor(0); //Guardo cualquier valor que tengan Botas
-
             Block bloqueOro = Blocks.GOLD_BLOCK;
-
             Block fuego = Blocks.FIRE;
             Block noFuego = Blocks.RED_CANDLE; //Alternativo
-
 
             floresVarias.add(Blocks.POPPY);
             floresVarias.add(Blocks.ORANGE_TULIP);
@@ -156,46 +153,40 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
             floresVarias.add(Blocks.PINK_TULIP);
             floresVarias.add(Blocks.OXEYE_DAISY);
 
-            BlockState estado = jugador.getBlockStateOn(); //EstadoBloqueDebajo
-            BlockPos posActual = jugador.getOnPos();   //Bloque debajo (pisando ahora)
+            ItemStack boots = jugador.getInventory().getArmor(0);
 
-//            estado.addRunningEffects()
+            BlockPos posActual = jugador.getOnPos();//Bloque debajo (pisando ahora)
 
             //Ejecutamos si el jugador ha pisado ya el bloque Y NO ES sobre el que esta ahora
              if(bloquesPisados.contains(posAnterior) && !posActual.equals(posAnterior)) {
-                 if (mundo.getBlockState(posAnterior).getMaterial().isSolid()) { //No transformamos "bloques" de aire
+                if (mundo.getBlockState(posAnterior).getMaterial().isSolid()) { //No transformamos "bloques" de aire
 
                      if (boots.getItem().equals(Items.GOLDEN_BOOTS)){
-                         mundo.setBlockAndUpdate(posAnterior.above(), bloqueOro.defaultBlockState());
+                         mundo.setBlockAndUpdate(posAnterior, bloqueOro.defaultBlockState());
                      }
-
                      if (boots.getItem().equals(Items.LEATHER_BOOTS)) {
                          //Aleatorio de [1,2]
                          int aleatorio = (int) (Math.random()*2)+1;
                          if(aleatorio==1) {
                              mundo.setBlockAndUpdate(posAnterior.above(), fuego.defaultBlockState());
                          }
-//                         else { //Alternativo
-//                             mundo.setBlockAndUpdate(posAnterior.above(), noFuego.defaultBlockState());
-//                         }
-//                        SimpleParticleType fuego2 = ParticleTypes.FLAME;
-//                        mundo.addAlwaysVisibleParticle(fuego2, posAnterior.getX(), posAnterior.getY(), posAnterior.getZ(), 0, 0, 0);
-                     }
-
-                     if (boots.getItem().equals(Items.IRON_BOOTS)) {
-                         int aleatorio = (int) (Math.random()*10)+1;
-                         if(aleatorio == 10) {
-                             System.out.println("Esto se imprime el 10% de las veces");
+                         else { //Alternativo
+                             mundo.setBlockAndUpdate(posAnterior.above(), noFuego.defaultBlockState());
                          }
-
-
                      }
-
+                     if (boots.getItem().equals(Items.IRON_BOOTS)) {
+                         Explosion explosion = new Explosion(mundo,jugador,posAnterior.getX()-2,posAnterior.getY(),posAnterior.getZ(),2.0f,true,BlockInteraction.BREAK);
+                         int aleatorio = (int) (Math.random()*10)+1;
+                         if(aleatorio == 10) { //Probabilidad del 10%
+                             explosion.explode();
+                             explosion.finalizeExplosion(true);
+                         }
+                     }
                      if (boots.getItem().equals(Items.DIAMOND_BOOTS)) {
                          int aleatorio = (int) (Math.random()*50);
                          mundo.setBlockAndUpdate(posAnterior.above(),floresVarias.get(aleatorio).defaultBlockState());
                      }
-                 }
+                }
              }
              else{//No cambiamos el suelo pero añadimos la posicion
                  bloquesPisados.add(posActual);
@@ -205,24 +196,6 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
         }
 
 }
-
-//            if (event.getInput().down) {
-//                System.out.println("down" + event.getInput().down);
-//
-//            }
-//            if (event.getInput().up) {
-//                System.out.println("up" + event.getInput().up);
-//
-//            }
-//            if (event.getInput().right) {
-//                System.out.println("right" + event.getInput().right);
-////                mundo.setBlockAndUpdate(posAnterior,bloqueOro.defaultBlockState());
-//
-//            }
-//            if (event.getInput().left) {
-//                System.out.println("left" + event.getInput().left);
-////                mundo.setBlockAndUpdate(posAnterior,bloqueOro.defaultBlockState());
-
 
 
 
