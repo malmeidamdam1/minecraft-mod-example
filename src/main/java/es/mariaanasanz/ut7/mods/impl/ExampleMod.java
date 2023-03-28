@@ -45,10 +45,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import javax.xml.stream.Location;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.sql.Time;
+import java.util.*;
 
 @Mod(DamMod.MOD_ID)
 public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStartEvent,
@@ -113,21 +111,21 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
     @Override
     @SubscribeEvent
     public void onPlayerTouch(PlayerInteractEvent.RightClickBlock event) {
-        System.out.println("¡Has hecho click derecho!");
+//        System.out.println("¡Has hecho click derecho!");
         BlockPos pos = event.getPos();
         BlockState state = event.getLevel().getBlockState(pos);
         Player player = event.getEntity();
         ItemStack heldItem = player.getMainHandItem();
         if (ItemStack.EMPTY.equals(heldItem)) {
-            System.out.println("La mano esta vacia");
+//            System.out.println("La mano esta vacia");
             if (state.getBlock().getName().getString().trim().toLowerCase().endsWith("log")) {
-                System.out.println("¡Has hecho click sobre un tronco!");
+//                System.out.println("¡Has hecho click sobre un tronco!");
             }
         }
     }
 
 
-//---------------------------------------------------------Desde aqui mi mod------------------------------------------//
+    //---------------------------------------------------------Desde aqui mi mod------------------------------------------//
     private Set<BlockPos> bloquesPisados = new HashSet<>();
     private ArrayList<Block> floresVarias = new ArrayList<>();
     private BlockPos posAnterior;
@@ -135,8 +133,7 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
     //Creo como atributo fuera para que no se reinicie llamar metodo
     @Override
     @SubscribeEvent
-//TODO El evento con el que voy a trabajar
-        public void onPlayerWalk(MovementInputUpdateEvent event) {
+    public void onPlayerWalk(MovementInputUpdateEvent event) {
         if (event.getEntity() instanceof Player) {
             Player jugador = event.getEntity();
             Level mundo = jugador.getCommandSenderWorld();
@@ -144,6 +141,7 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
             Block bloqueOro = Blocks.GOLD_BLOCK;
             Block fuego = Blocks.FIRE;
             Block noFuego = Blocks.RED_CANDLE; //Alternativo
+            Block telarana = Blocks.COBWEB;
 
             floresVarias.add(Blocks.POPPY);
             floresVarias.add(Blocks.ORANGE_TULIP);
@@ -158,44 +156,56 @@ public class ExampleMod extends DamMod implements IBlockBreakEvent, IServerStart
             BlockPos posActual = jugador.getOnPos();//Bloque debajo (pisando ahora)
 
             //Ejecutamos si el jugador ha pisado ya el bloque Y NO ES sobre el que esta ahora
-             if(bloquesPisados.contains(posAnterior) && !posActual.equals(posAnterior)) {
+            if (bloquesPisados.contains(posAnterior) && !posActual.equals(posAnterior)) {
                 if (mundo.getBlockState(posAnterior).getMaterial().isSolid()) { //No transformamos "bloques" de aire
 
-                     if (boots.getItem().equals(Items.GOLDEN_BOOTS)){
-                         mundo.setBlockAndUpdate(posAnterior, bloqueOro.defaultBlockState());
-                     }
-                     if (boots.getItem().equals(Items.LEATHER_BOOTS)) {
-                         //Aleatorio de [1,2]
-                         int aleatorio = (int) (Math.random()*2)+1;
-                         if(aleatorio==1) {
-                             mundo.setBlockAndUpdate(posAnterior.above(), fuego.defaultBlockState());
-                         }
-                         else { //Alternativo
-                             mundo.setBlockAndUpdate(posAnterior.above(), noFuego.defaultBlockState());
-                         }
-                     }
-                     if (boots.getItem().equals(Items.IRON_BOOTS)) {
-                         Explosion explosion = new Explosion(mundo,jugador,posAnterior.getX()-2,posAnterior.getY(),posAnterior.getZ(),2.0f,true,BlockInteraction.BREAK);
-                         int aleatorio = (int) (Math.random()*10)+1;
-                         if(aleatorio == 10) { //Probabilidad del 10%
-                             explosion.explode();
-                             explosion.finalizeExplosion(true);
-                         }
-                     }
-                     if (boots.getItem().equals(Items.DIAMOND_BOOTS)) {
-                         int aleatorio = (int) (Math.random()*50);
-                         mundo.setBlockAndUpdate(posAnterior.above(),floresVarias.get(aleatorio).defaultBlockState());
-                     }
+                    if (boots.getItem().equals(Items.GOLDEN_BOOTS)) {
+                        mundo.setBlockAndUpdate(posAnterior, bloqueOro.defaultBlockState());
+                    }
+                    if (boots.getItem().equals(Items.LEATHER_BOOTS)) {
+                        int aleatorio = (int) (Math.random() * 2) + 1;
+                        if (aleatorio == 1) {
+                            mundo.setBlockAndUpdate(posAnterior.above(), fuego.defaultBlockState());
+                        } else { //Alternativo
+                            mundo.setBlockAndUpdate(posAnterior.above(), noFuego.defaultBlockState());
+                        }
+                    }
+                    if (boots.getItem().equals(Items.IRON_BOOTS)) {
+                        Explosion explosion = new Explosion(mundo, jugador, posAnterior.getX() - 2, posAnterior.getY(), posAnterior.getZ(), 2.0f, true, BlockInteraction.BREAK);
+                        int aleatorio = (int) (Math.random() * 10) + 1;
+                        if (aleatorio == 10) { //Probabilidad del 10%
+                            explosion.explode();
+                            explosion.finalizeExplosion(true);
+                        }
+                    }
+                    if (boots.getItem().equals(Items.DIAMOND_BOOTS)) {
+                        int aleatorio = (int) (Math.random() * 50);
+                        mundo.setBlockAndUpdate(posAnterior.above(), floresVarias.get(aleatorio).defaultBlockState());
+                    }
+                    if (boots.getItem().equals(Items.NETHERITE_BOOTS)) {
+                        int aleatorio = (int) (Math.random()*4)+1;
+                        if(aleatorio == 1) {//Probabilidad del 25%
+                            mundo.setBlockAndUpdate(posAnterior.above(), telarana.defaultBlockState());
+                        }
+                    }
+                    if (boots.getItem().equals(Items.CHAINMAIL_BOOTS)) {
+                        if (event.getInput().right) {
+                            mundo.setRainLevel(100F);
+                        }
+                        if (event.getInput().left) {
+                            mundo.setRainLevel(0F);
+                        }
+                    }
                 }
-             }
-             else{//No cambiamos el suelo pero añadimos la posicion
-                 bloquesPisados.add(posActual);
-             }//PosAnterior se actualiza constantemente
-            posAnterior = posActual;
             }
+            else {//No cambiamos el suelo pero añadimos la posicion
+                bloquesPisados.add(posActual);
+            }//PosAnterior se actualiza constantemente
+            posAnterior = posActual;
         }
-
+    }
 }
+
 
 
 
